@@ -1,0 +1,16 @@
+data_module:
+  data_dir: 'data'
+  batch_size: 128
+  num_workers: 4
+  subset_fraction: 1.0
+  valid_size: 0.1
+
+learning_rate: 0.001
+max_epochs: 20
+baseline_name: 'Resnet-18'
+
+model:
+  oft_layers: [3, 4]
+  r: 1
+  num_matrices: 2
+
