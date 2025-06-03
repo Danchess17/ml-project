@@ -10,7 +10,7 @@ max_epochs: 20
 baseline_name: 'Resnet-18'
 
 model:
-  oft_layers: [3, 4]
+  odk_layers: [3, 4]
   r: 1
   num_matrices: 2
 

@@ -15,10 +15,9 @@ def load_architecture_from_config(config):
     if config.baseline_name == "Resnet-18":
         model = resnet18(
             num_classes=10,
-            oft_layers=model_params.oft_layers,
+            odk_layers=model_params.odk_layers,
             r=model_params.r,
             num_matrices=model_params.num_matrices,
-            # block_share=model_params.oft.block_share,
         )
     else:
         raise ValueError(f"Неизвестная модель: {config.baseline_name}")

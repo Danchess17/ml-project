@@ -4,20 +4,19 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from oft_conv_rect_many import OFTConv2d
+from odk import ODKConv2d
 
 
 def conv3x3(
     in_channels: int,
     out_channels: int,
     stride: int = 1,
-    oft: bool = True,
+    odk: bool = True,
     r: int = 1,
     num_matrices: int = 1,
-    # block_share: bool = False,
-) -> Union[nn.Conv2d, OFTConv2d]:
-    if oft:
-        return OFTConv2d(
+) -> Union[nn.Conv2d, ODKConv2d]:
+    if odk:
+        return ODKConv2d(
             in_channels=in_channels,
             out_channels=out_channels,
             kernel_size=3,
@@ -26,7 +25,6 @@ def conv3x3(
             bias=False,
             r=r,
             num_matrices=num_matrices,
-            # block_share=block_share,
         )
     return nn.Conv2d(
         in_channels=in_channels,
@@ -54,10 +52,9 @@ class BasicBlock(nn.Module):
         in_channels: int,
         out_channels: int,
         stride: int = 1,
-        oft: bool = True,
+        odk: bool = True,
         r: int = 1,
         num_matrices: int = 1,
-        # block_share: bool = False,
         downsample: Optional[nn.Module] = None,
     ) -> None:
         super().__init__()
@@ -65,7 +62,7 @@ class BasicBlock(nn.Module):
             in_channels,
             out_channels,
             stride,
-            oft=oft,
+            odk=odk,
             r=r,
             num_matrices=num_matrices,
         )
@@ -74,7 +71,7 @@ class BasicBlock(nn.Module):
         self.conv2 = conv3x3(
             out_channels,
             out_channels,
-            oft=oft,
+            odk=odk,
             r=r,
             num_matrices=num_matrices,
         )
@@ -106,10 +103,9 @@ class Resnet(nn.Module):
         self,
         layers: List[int],
         num_classes: int = 1000,
-        oft_layers: List[int] = [3, 4],
+        odk_layers: List[int] = [3, 4],
         r: int = 1,
         num_matrices: int = 1,
-        # block_share: bool = False,
     ) -> None:
         super().__init__()
         self.in_channels = 64
@@ -122,7 +118,7 @@ class Resnet(nn.Module):
         self.layer1 = self._make_layer(
             64,
             blocks=layers[0],
-            oft=(1 in oft_layers),
+            odk=(1 in odk_layers),
             r=r,
             num_matrices=num_matrices,
         )
@@ -130,7 +126,7 @@ class Resnet(nn.Module):
             128,
             blocks=layers[1],
             stride=2,
-            oft=(2 in oft_layers),
+            odk=(2 in odk_layers),
             r=r,
             num_matrices=num_matrices,
         )
@@ -138,7 +134,7 @@ class Resnet(nn.Module):
             256,
             blocks=layers[2],
             stride=2,
-            oft=(3 in oft_layers),
+            odk=(3 in odk_layers),
             r=r,
             num_matrices=num_matrices,
         )
@@ -146,7 +142,7 @@ class Resnet(nn.Module):
             512,
             blocks=layers[3],
             stride=2,
-            oft=(4 in oft_layers),
+            odk=(4 in odk_layers),
             r=r,
             num_matrices=num_matrices,
         )
@@ -158,10 +154,9 @@ class Resnet(nn.Module):
         out_channels: int,
         blocks: int,
         stride: int = 1,
-        oft: bool = True,
+        odk: bool = True,
         r: int = 1,
         num_matrices: int = 1,
-        # block_share: bool = False,
     ) -> nn.Sequential:
         downsample = None
         if stride != 1 or self.in_channels != out_channels:
@@ -177,10 +172,9 @@ class Resnet(nn.Module):
                 out_channels=out_channels,
                 stride=stride,
                 downsample=downsample,
-                oft=oft,
+                odk=odk,
                 r=r,
                 num_matrices=num_matrices,
-                # block_share=block_share
             )
         )
         self.in_channels = out_channels
@@ -189,7 +183,7 @@ class Resnet(nn.Module):
                 BasicBlock(
                     self.in_channels,
                     out_channels,
-                    oft=oft,
+                    odk=odk,
                     r=r,
                     num_matrices=num_matrices,
                 )
