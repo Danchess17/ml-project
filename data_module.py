@@ -1,31 +1,7 @@
-import tarfile
-from pathlib import Path
-
-import dvc.api
 import numpy as np
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader, SubsetRandomSampler
 from torchvision import datasets, transforms
-
-
-def download_dataset(
-    data_dir: str,
-    path_in_repo: str = "data/cifar-10-python.tar.gz",
-):
-    data_path = Path(data_dir)
-    archive_path = data_path / "cifar-10-python.tar.gz"
-
-    if not archive_path.exists():
-        print("Downloading dataset via DVC...")
-        dvc.api.get_file(
-            path=path_in_repo,
-            repo=".",  # текущий репозиторий
-            out=str(archive_path),  # dvc ожидает строку
-        )
-
-    print("Extracting dataset...")
-    with tarfile.open(archive_path, "r:gz") as tar:
-        tar.extractall(path=data_path)
 
 
 class CIFAR10DataModule(pl.LightningDataModule):
@@ -60,7 +36,9 @@ class CIFAR10DataModule(pl.LightningDataModule):
         )
 
     def prepare_data(self):
-        download_dataset(self.data_dir)
+        # Скачиваем данные
+        datasets.CIFAR10(self.data_dir, train=True, download=True)
+        datasets.CIFAR10(self.data_dir, train=False, download=True)
 
     def setup(self, stage=None):
         if stage == "fit" or stage is None:
